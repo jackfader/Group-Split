@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Group Split</title>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700&display=swap">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+  <style>
+    body {display:flex; justify-content:center; align-items:center; min-height:100vh; background-color:#e3f2fd;}
+    .container {max-width:600px; padding:1rem;}
+    .blue {background-color:#2196f3;}
+    .item-row {display:flex; align-items:center;}
+    .item-row input {flex:1;}
+    .item-row button {margin-left:1rem;}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <div class="card-content">
+        <span class="card-title">Group Split</span>
+        <div id="items"></div>
+        <button id="addItem" class="btn waves-effect waves-light blue">Add Item</button>
+        <div class="input-field">
+          <select id="numPeople">
+            <option value="" disabled selected>Select number of people</option>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+            <option value="6">6</option>
+            <option value="7">7</option>
+            <option value="8">8</option>
+            <option value="9">9</option>
+
+          </select>
+          <label for="numPeople">People to split</label>
+        </div>
+        <div>Total: $<span id="total">0.00</span></div>
+        <div>Per Person: $<span id="perPerson">0.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => M.FormSelect.init(document.querySelectorAll('select')));
+
+    const items = document.getElementById("items"), addItem = document.getElementById("addItem"), numPeople = document.getElementById("numPeople"), totalEl = document.getElementById("total"), perPersonEl = document.getElementById("perPerson");
+    let total = 0;
+
+    const updateTotal = () => {
+      const num = parseInt(numPeople.value) || 1;
+      totalEl.textContent = total.toFixed(2);
+      perPersonEl.textContent = (total / num).toFixed(2);
+    };
+
+    const removeItem = (row, cost) => {
+      items.removeChild(row);
+      total -= parseFloat(cost.value);
+      updateTotal();
+    };
+
+    addItem.addEventListener("click", () => {
+      const row = document.createElement("div"), itemInput = document.createElement("input"), costInput = document.createElement("input"), removeBtn = document.createElement("button");
+      row.className = "item-row";
+      itemInput.placeholder = "Item";
+      costInput.type = "number";
+      costInput.placeholder = "Cost";
+      removeBtn.className = "btn waves-effect waves-light red";
+      removeBtn.textContent = "Remove";
+      removeBtn.addEventListener("click", () => removeItem(row, costInput));
+      costInput.addEventListener("input", (e) => {
+        total -= parseFloat(costInput.dataset.prev || 0);
+        total += parseFloat(e.target.value || 0);
+        costInput.dataset.prev = e.target.value;
+        updateTotal();
+      });
+      row.appendChild(itemInput);
+      row.appendChild(costInput);
+      row.appendChild(removeBtn);
+      items.appendChild(row);
+    });
+
+    numPeople.addEventListener("change", updateTotal);
+  </script>
+</body>
+</html>
